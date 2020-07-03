@@ -6,7 +6,7 @@ var buttonColours = ["red", "blue", "green", "yellow"];
 
 var level = 0;
 
-
+var keyPressed = false;
 
 
 
@@ -21,8 +21,19 @@ $(document).keydown(function (){
     
     // $('#'+randomChosenColour).fadeOut(250).fadeIn(250);
     
+    if (keyPressed === false) {
+        var randomChosenColour = nextSequence();
+        playSound(randomChosenColour);
+        animatePress(randomChosenColour);
+        keyPressed = true;
+        console.log(keyPressed);
+    }
+
+    console.log(keyPressed);
+
+
     console.log(gamePattern);
-    var randomChosenColour = nextSequence();
+    // var randomChosenColour = nextSequence();   @@@@@@@@@@@@@@@@@@@@@@@@@
 
     // var randomNumber = nextSequence();
     
@@ -30,8 +41,10 @@ $(document).keydown(function (){
 
     // var randomChosenColour = buttonColours[randomNumber];
 
-    playSound (randomChosenColour);
-    animatePress(randomChosenColour);
+    // playSound (randomChosenColour);   @@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    // animatePress(randomChosenColour);   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
+
+
     // gamePattern.push(randomChosenColour);
 });
 
@@ -44,9 +57,17 @@ $(".btn").click(function () {
         // $('#'+userChosenColour).fadeOut(250).fadeIn(250);  - wymienilem na funkcje animatePress
     playSound(userChosenColour);
 
-    console.log(userClickedPattern);
-    console.log(gamePattern);
-    // nextSequence();
+    console.log(userClickedPattern + " user Clicked Pattern");
+    console.log(gamePattern + " game Pattern");
+
+    // if (gamePattern.length === userClickedPattern.length) {
+        checkAnswer();   
+    // }
+
+
+
+
+
 
 });
 
@@ -100,16 +121,94 @@ function nextSequence() {
 
     // var randomNumber = nextSequence();
     
-    console.log(randomNumber);
+    // console.log(randomNumber);
 
     var randomChosenColour = buttonColours[randomNumber];
 
     gamePattern.push(randomChosenColour);
+    
+    $("#level-title").text("Level " + level);
+
+    level++;
+
+    console.log(level);
 
     return randomChosenColour;
-
 };
 
+
+function checkAnswer() {
+    if (arraysEqual(userClickedPattern, gamePattern) === false) {
+        console.log("wrong");
+        startOver();
+        var wrongSound = new Audio ("sounds/wrong.mp3");
+        wrongSound.play();
+        $("body").addClass("game-over")
+        setTimeout (function(){
+            console.log("timeout wrong");
+            $("body").removeClass("game-over");
+           
+        },200);
+        $("#level-title").text("Press A Key to Start");
+    } else if (userClickedPattern.length === gamePattern.length && arraysEqual(userClickedPattern, gamePattern) === true) {
+        console.log("succes");
+        setTimeout (function(){
+            console.log("timeout succes");
+            userClickedPattern = [];
+            var randomChosenColour = nextSequence();
+            playSound(randomChosenColour);
+            animatePress(randomChosenColour);
+            console.log(gamePattern);
+        },1000);
+    };
+
+    // if (arraysEqual(userClickedPattern, gamePattern)) {
+    //     console.log("succes");
+    //     setTimeout (function(){
+    //         console.log("timeout succes");
+    //         userClickedPattern = [];
+    //         var randomChosenColour = nextSequence();
+    //         playSound(randomChosenColour);
+    //         animatePress(randomChosenColour);
+    //         console.log(gamePattern);
+    //     },1000);
+    // } else {
+    //     console.log("wrong");
+    //     startOver();
+    //     var wrongSound = new Audio ("sounds/wrong.mp3");
+    //     wrongSound.play();
+    //     $("body").addClass("game-over")
+    //     setTimeout (function(){
+    //         console.log("timeout wrong");
+    //         $("body").removeClass("game-over");
+           
+    //     },200);
+    //     $("#level-title").text("Press A Key to Start");
+    // }
+
+}
+
+function startOver () {
+    level = 0;
+    gamePattern = [];
+    userClickedPattern = [];
+    keyPressed = false;
+}
+function arraysEqual(a, b) {
+    // if (a === b) return true;
+    // if (a == null || b == null) return false;
+    // if (a.length !== b.length) return false;
+  
+    // If you don't care about the order of the elements inside
+    // the array, you should sort both arrays here.
+    // Please note that calling sort on an array will modify that array.
+    // you might want to clone your array first.
+  
+    for (var i = 0; i < a.length; ++i) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
+  }
 // SOUND PLAY FOR EACH DIV
 
 function playSound (name) {
